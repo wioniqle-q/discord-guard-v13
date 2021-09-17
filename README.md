@@ -11,3 +11,4 @@
 # Sunucunuzu bu altyapı ile güvenli hale getirebilirsiniz.
 # Ek şeyler isterseniz Issues açıp bildirin bende yapıp ekleyeyim veya hata olursa yazın.
 # Dc ismim: ❃ wioniqle.q#4661 | 790018895847096380
+# DM ÜZERİNDEN BU ALTYAPI İÇİN YARDIMDA BULUNUYORUM!
