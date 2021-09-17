@@ -86,7 +86,7 @@ client.on("roleDelete", async (role) => {
       if(nrole.deleted) break;
       processBot(process, true, Falls);
       const tokens = changeData.Members.slice(i * Falls, (i + 1) * Falls);
-      if (tokens.length < 0) {
+      if (tokens.length <= 0) {
         processBot(process, false, -Falls); 
         break;
       };
