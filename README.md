@@ -1,5 +1,5 @@
 # MİLLETE STAR KASTIRMAYIN 
-
+# BAŞKA PROJELER İSTEYENLER İSSUES AÇSIN BU PROJEYE
 # Bu discord'da 2 satırlık kod için birbirlerini yiyenlerin ağzına teker teker boydan gireyim...
 # Alın guard bot paşa paşa kullanın.
 # Projeyi herhangi bir yerde izinsiz paylaşırsanız/satarsanız vb... Zaman damgası ile koruyorum ebenizi bellerim. 
