@@ -1,4 +1,4 @@
-# guard-bot-istenmis
+# MİLLETE STAR KASTIRMAYIN 
 
 # Bu discord'da 2 satırlık kod için birbirlerini yiyenlerin ağzına teker teker boydan gireyim...
 # Alın guard bot paşa paşa kullanın.
