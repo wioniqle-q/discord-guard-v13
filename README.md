@@ -6,6 +6,8 @@
 # Gelişmiş guard botudur, otomatiktir, mongodb kullanıldı, sağlamdır, bu altyapıda birilerinin sunucunuzu patlatacağını zannetmiyorum çünkü bu altyapı 4 botla kurduktan sonra patlatamazlar...
 # Bu paylaştığım guard botu benim kendi sunucumda ve bot yaptığım sunucularda kullandığım altyapı değildir.
 # Prim kasmayın...
+# Guard için millete star kastırmayın ve salak olmayın amk.
+# Gerizekalı gibi star kastırıyorsunuz millete hahahaha.
 # Sunucunuzu bu altyapı ile güvenli hale getirebilirsiniz.
 # Ek şeyler isterseniz Issues açıp bildirin bende yapıp ekleyeyim veya hata olursa yazın.
 # Dc ismim: ❃ wioniqle.q#4661 | 790018895847096380
