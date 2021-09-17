@@ -20,7 +20,7 @@ Mongoose.connection.once("open", async () => {
     let Bot = new Client({ intents: Object.values(Intents.FLAGS) })
     Bot.on("ready", () => {
       Bot.Busy = false;
-      Bot.Uj = 0;
+      Bot.Task = 0;
       global.Bots.push(Bot);
       console.log(`[SUPPORTER] ${Bot.user.tag} is ready!`);
       Bot.user.setPresence({ activities: [{ name: STATUS }] });
