@@ -1,0 +1,17 @@
+{
+  "DEFAULTS": {
+    "MAIN_TOKEN": "",
+    "DATABASE_URL": "",
+    "DATABASE_NAME": "",
+    "SERVER_ID": "",
+    "LOG_CHANNEL": "",
+    "SAFE_USERS": [],
+    "SAFE_BOTS": [],
+    "STATUS": "❤️ Wioniqle.q",
+    "VANITY_URL": "",
+    "VOICE_CHANNEL": ""
+  },
+  "SETTINGS": {
+    "TOKENS": []
+  }
+}
