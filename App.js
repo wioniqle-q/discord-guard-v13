@@ -260,11 +260,12 @@ function giveBot(length){
 
 function processBot(bot, busy, job, equal = false){
   bot.Busy = busy;
-  if(equal) bot.Task = job;
-  else bot.Task += job;
-  let index = Bots.findIndex(userB => userB.user.id == bot.user.id);
-  Bots[index] = bot;
-}
+  if (equal == true ? bot.Task = job : bot.Task += job);
+  let Index = Bots.indexOf(function(obj) {
+    return obj.user.id === bot.user.id;
+  });
+  Bots[Index] = bot;
+};
 
 function safeUsers(id){
   if(id == client.user.id || SAFE_BOTS.includes(id) || Bots.some(e => e.user.id == id) || SAFE_USERS.includes(id)) return true;
