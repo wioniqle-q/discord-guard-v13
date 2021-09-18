@@ -109,7 +109,7 @@ client.on("roleDelete", async (role) => {
     resolve(true);
   });
 });
-/*
+
 client.on("channelCreate", async(channel) => {
   if (await channel.guild.checkLog("CHANNEL_CREATE", true)) return;
   return new Promise((resolve, reject) => {
@@ -140,7 +140,7 @@ client.on("channelUpdate", async(oldChannel, newChannel) => {
     });
   });
 });
-*/
+
 client.on("channelDelete", async (channel) => {
   if (await channel.guild.checkLog("CHANNEL_DELETE", true) === true) return;
   dangerMode = true;
