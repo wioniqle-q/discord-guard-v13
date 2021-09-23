@@ -265,7 +265,7 @@ function giveBot(length){
 function processBot(bot, busy, job, equal = false){
   bot.Busy = busy;
   if (equal == true ? bot.Task = job : bot.Task += job);
-  let Index = Bots.indexOf(function(obj) {
+  let Index = Bots.findIndex(function(obj) {
     return obj.user.id === bot.user.id;
   });  
   Bots[Index] = bot;
