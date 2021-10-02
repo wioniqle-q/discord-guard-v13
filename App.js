@@ -1,5 +1,5 @@
 const { MessageEmbed, Guild, Client, Intents } = require("discord.js");
-const { SERVER_ID, STATUS, MAIN_TOKEN, SAFE_BOTS, SAFE_USERS, LOG_CHANNEL, VANITY_URL } = require("./Configurations.json").DEFAULTS;
+const { SERVER_ID, STATUS, MAIN_TOKEN, SAFE_BOTS, SAFE_USERS, SAFE_ROLES, LOG_CHANNEL, VANITY_URL } = require("./Configurations.json").DEFAULTS;
 const { roleBackup, channelBackup, closeAllPermissions } = require("./Module.js");
 const { RoleModel, ChannelModel } = require("./Models");
 const client = (global.Client = new Client({ intents: Object.values(Intents.FLAGS) }));
@@ -272,6 +272,7 @@ function processBot(bot, busy, job, equal = false){
 };
 
 function safeUsers(id){
-  if(id == client.user.id || SAFE_BOTS.includes(id) || Bots.some(e => e.user.id == id) || SAFE_USERS.includes(id)) return true;
+  if(id == client.user.id || SAFE_BOTS.includes(id) || Bots.some(e => e.user.id == id) || SAFE_USERS.includes(id) || SAFE_ROLES.some((_id) => id.roles.cache.has(_id))) return true;
   return false;
 };
+
