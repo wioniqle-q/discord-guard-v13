@@ -1,8 +1,8 @@
 const { MessageEmbed, Guild, Client, Intents } = require("discord.js");
 const { SERVER_ID, STATUS, MAIN_TOKEN, SAFE_BOTS, SAFE_USERS, SAFE_ROLES, LOG_CHANNEL, VANITY_URL } = require("./Configurations.json").DEFAULTS;
-const { roleBackup, channelBackup, closeAllPermissions } = require("./Module.js");
+const { getUpdate, closeAllPermissions } = require("./Module.js");
 const { RoleModel, ChannelModel } = require("./Models");
-const client = (global.Client = new Client({ intents: Object.values(Intents.FLAGS) }));
+const client = (global.Client = new Client({ intents: [32767] }));
 require("./Connection");
 const Bots = global.Bots = [];
 let dangerMode = false;
@@ -12,26 +12,31 @@ client.on("ready", async () => {
   client.user.setPresence({ activities: [{ name: STATUS }] });
   setInterval(async () => {
     if (dangerMode === true) return;
-    await roleBackup(client.guilds.cache.get(SERVER_ID));
-    await channelBackup(client.guilds.cache.get(SERVER_ID));
+    await getUpdate(client.guilds.cache.get(SERVER_ID));
   }, 60 * 60 * 1000);
 });
 
 client.on("roleCreate", async (role) => {
   if (await role.guild.checkLog("ROLE_CREATE", true)) return;
-  return new Promise((resolve, reject) => {
-    if (!role.deleted) resolve(role.delete()).catch((e) => { 
-      reject(e);
-    });
+  return new Promise(async (resolve) => {
+    try {
+      if (!role.deleted) role.delete();
+      resolve();
+    } catch (Expect) {
+      console.log("roleCreate", Expect);
+    }
   });
 });
 
 client.on("roleUpdate", async(oldRole, newRole) => {
   if (await oldRole.guild.checkLog("ROLE_UPDATE", true)) return;
-  return new Promise((resolve, reject) => {
-    resolve(newRole.edit({ color: oldRole.color, hoist: oldRole.hoist, mentionable: oldRole.mentionable, name: oldRole.name, permissions: oldRole.permissions, position: oldRole.rawPosition })).catch((e) => { 
-      reject(e);
-    });
+  return new Promise(async (resolve) => {
+    try {
+      newRole.edit({ color: oldRole.color, hoist: oldRole.hoist, mentionable: oldRole.mentionable, name: oldRole.name, permissions: oldRole.permissions, position: oldRole.rawPosition });
+      resolve();
+    } catch (Expect) {
+      console.log("roleUpdate", Expect);
+    };
   });
 });
 
@@ -265,9 +270,7 @@ function giveBot(length){
 function processBot(bot, busy, job, equal = false){
   bot.Busy = busy;
   if (equal == true ? bot.Task = job : bot.Task += job);
-  let Index = Bots.findIndex(function(obj) {
-    return obj.user.id === bot.user.id;
-  });  
+  let Index = Bots.findIndex((obj) => obj.user.id == bot.user.id);  
   Bots[Index] = bot;
 };
 
