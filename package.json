@@ -1,18 +1,18 @@
 {
   "name": "wio-guard",
-  "version": "9.3.4",
+  "version": "10.2.7",
   "description": "",
   "main": "App.js",
   "scripts": {
     "start": "node App.js"
   },
   "dependencies": {
-    "discord.js": "^13.1.0",
-    "mongoose": "^6.0.8",
+    "discord.js": "^13.2.0",
+    "mongoose": "^6.0.10",
     "moment": "^2.29.1",
-    "axios": "^0.22.0"
+    "axios": "^0.23.0"
   },
   "engines": {
-    "node": "16.10.0"
+    "node": "16.11.1"
   }
 }
