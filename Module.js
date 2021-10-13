@@ -5,28 +5,20 @@ const { RoleModel, ChannelModel } = require("./Models");
 const dangerPerms = ["ADMINISTRATOR", "KICK_MEMBERS", "MANAGE_GUILD", "BAN_MEMBERS", "MANAGE_ROLES", "MANAGE_WEBHOOKS", "MANAGE_CHANNELS"];
 const client = global.Client;
 
-async function roleBackup(guild) {
+async function getUpdate(guild) {
   try {
     await RoleModel.deleteMany({}).exec();
     guild.roles.cache.forEach((_role) => {
       if (Object.keys(_role.members.size) === 0) return;
-      RoleModel.updateOne({ Id: role.id }, { $set: { Members: role.members.map(member => member.id) } }, { upsert: true }).exec();
+      RoleModel.updateOne({ Id: _role.id }, { $set: { Members: _role.members.map(member => member.id) } }, { upsert: true }).exec();
     });
-    console.log("Role data is saved!");
-  } catch ({}) {
-    Promise.reject(null);
-  };
-};
-
-async function channelBackup(guild) {
-  try {
     await ChannelModel.deleteMany({}).exec();
     guild.channels.cache.forEach(async (_channel) => {
       await new ChannelModel({
-        Id: channel.id,
-        Type: channel.type,
-        Parent: channel.parent ? channel.parentId: null,
-        Permissions: [...channel.permissionOverwrites.cache.values()].map((_permissions) => {
+        Id: _channel.id,
+        Type: _channel.type,
+        Parent: _channel.parent ? _channel.parentId: null,
+        Permissions: [..._channel.permissionOverwrites.cache.values()].map((_permissions) => {
           return {
             id: _permissions.id,
             type: _permissions.type,
@@ -36,7 +28,7 @@ async function channelBackup(guild) {
         })
       }).save();
     });
-    console.log("Channel data is saved!");
+    console.log("All updates complete");
   } catch ({}) {
     Promise.reject(null);
   };
@@ -53,5 +45,5 @@ async function closeAllPermissions(Guild) {
 };
 
 module.exports = {
-  roleBackup, channelBackup, closeAllPermissions
+  getUpdate, closeAllPermissions
 };
