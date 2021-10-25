@@ -145,7 +145,6 @@ client.on("channelDelete", async (channel) => {
   if (await channel.guild.checkLog("CHANNEL_DELETE", true) === true) return;
   
   let deletedChannels = await ChannelModel.findOne({ Id: channel.id });
-  
   for (const deletedChannel of [deletedChannels]) {
     const newChannel = (await channel.guild.channels.create(channel.name, {
       nsfw: channel.nsfw,
