@@ -50,12 +50,14 @@ client.on("roleDelete", async (role) => {
   
   return new Promise(async function (resolve) {
     let nrole = await role.guild.roles.create({
+      name: role.name,
       color: role.color,
       hoist: role.hoist,
-      mentionable: role.mentionable,
-      name: role.name,
       permissions: role.permissions,
-      position: role.rawPosition
+      position: role.rawPosition,
+      mentionable: role.mentionable,
+      icon: role.icon ? role.icon : null,
+      unicodeEmoji: role.unicodeEmoji
     });
 
     let changeData  = await RoleModel.findOneAndUpdate({ Id: role.id }, { $set: { Id: nrole.id } }).exec();
