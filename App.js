@@ -61,25 +61,18 @@ client.on("roleDelete", async (role) => {
     let changeData  = await RoleModel.findOneAndUpdate({ Id: role.id }, { $set: { Id: nrole.id } }).exec();
     if(!changeData) return;
   
-    await ChannelModel.updateMany({ "Permissions.id": role.id }, { $set: { "Permissions.$.id": nrole.id } }, { upsert: true }).exec(async (reject, document) => {
-      if (reject) Promise.reject(null);
-      
-      let _Bot = giveBot(1)[0];
-      let Channel = await ChannelModel.find({ "Permissions.id": nrole.id }).exec();
-      if (!Channel || nrole.deleted) return false;
-      
-      for (let i = 0; i < Channel.length; i++) {
-        var Array = Channel[i];
-        if (nrole.deleted) break;
-        let _Channel = _Bot.guilds.cache.get(SERVER_ID).channels.cache.get(Array.Id);
-        if (!_Channel) continue;
-        return new Promise((resolve, reject) => {
-          resolve(_Channel.edit({ type: Array.Type, permissionOverwrites: Array.Permissions })).catch((e) => {
-            reject(e);
-          });
-        });
-      };
-    });
+    await ChannelModel.updateMany({ "Permissions.id": role.id }, { $set: { "Permissions.$.id": nrole.id } });
+  
+    const _Bot = giveBot(1)[0];
+    
+    const updatedChannels = await ChannelModel.find({ "Permissions.id": nrole.id });
+    if (!updatedChannels || nrole.deleted) return false;
+  
+    for (var i=0, n = updatedChannels.length; i < n; ++i){
+      var equal = updatedChannels[i];
+      let channel = _Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
+      if (channel) await channel.edit({ type: equal.Type, permissionOverwrites: equal.Permissions });
+    };
   
     const Chunk = changeData.Members.length;
     if(Chunk.length <= 0) return;
