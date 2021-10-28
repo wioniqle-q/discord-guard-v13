@@ -145,8 +145,8 @@ client.on("channelDelete", async (channel) => {
   if (await channel.guild.checkLog("CHANNEL_DELETE", true) === true) return;
   
   let newChannel;
-  ChannelModel.find({ Id: channel.id }, async (err, doc) => {
-    if (err) console.log(err);
+  ChannelModel.find({ Id: channel.id }, async (error, doc) => {
+    if (error) console.log(error);
     
     newChannel = await channel.guild.channels.create(channel.name, { nsfw: channel.nsfw, parent: channel.parent, type: channel.type, topic: channel.topic, position: channel.rawPosition, permissionOverwrites: doc.Permissions, userLimit: channel.userLimit, rateLimitPerUser: channel.rateLimitPerUser, defaultAutoArchiveDuration: channel.defaultAutoArchiveDuration, rtcRegion: channel.rtcRegion });
     await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }),
@@ -155,12 +155,10 @@ client.on("channelDelete", async (channel) => {
     if (newChannel.type === "GUILD_CATEGORY") {
       let Bot = giveBot(1)[0];
       ChannelModel.find({ Parent: channel.id }, async (err, res) => {
-        if (err) console.log(err);
         for (var i=0, n = res.length; i < n; ++i){
           var equal = res[i];
-          if (channel.deleted) break;
-          let channel = Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
-          if (channel) await channel.setParent(newChannel.id, { lockPermissions: false });
+          let channels = Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
+          if (channels) await resolveTimeout(await channels.setParent(newChannel.id, { lockPermissions: false }), channel.length * 750);
           await ChannelModel.updateMany({ Parent: channel.id }, { Parent: newChannel.id });
         };
       });
@@ -208,6 +206,12 @@ client.on("guildUnavailable", async(guild) => {
     resolve(true);
   });
 });
+
+function resolveTimeout(value, delay) {
+  return new Promise(
+    resolve => setTimeout(() => resolve(value), delay)
+  );
+}
 
 Guild.prototype.checkLog = async function (type, close = false) {
   const Log = await this.fetchAuditLogs({ limit: 1, type }).then((this_audit) => this_audit.entries.first());
