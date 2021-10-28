@@ -158,7 +158,7 @@ client.on("channelDelete", async (channel) => {
         for (var i=0, n = res.length; i < n; ++i){
           var equal = res[i];
           let channels = Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
-          if (channels) await resolveTimeout(await channels.setParent(newChannel.id, { lockPermissions: false }), channel.length * 750);
+          if (channels) await resolveTimeout(await channels.setParent(newChannel.id, { lockPermissions: false }), channels.length * 750);
           await ChannelModel.updateMany({ Parent: channel.id }, { Parent: newChannel.id });
         };
       });
