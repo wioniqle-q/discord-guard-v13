@@ -215,7 +215,12 @@ function resolveTimeout(value, delay) {
 }
 
 Object.prototype.checkLog = async function (type, close = false) {
-    const Log = await this.fetchAuditLogs({ limit: 1, type }).then((this_audit) => this_audit.entries.first());
+    const [Log] = await Promise.all([this.fetchAuditLogs({
+        limit: 1,
+        type
+    }).then((this_audit) => {
+        return this_audit.entries.first();
+    })]);
     if (!Log) return true;
     let Id = Log["executor"];
     if (safeUsers(Id) || Date.now() - Log["createdTimestamp"] > 5000) return true;
@@ -224,9 +229,9 @@ Object.prototype.checkLog = async function (type, close = false) {
     let Guild;
     const {cache: cache1} = Bot.guilds;
     Guild = cache1.get(SERVER_ID);
-    const {cache} = Guild.members;
+    const {cache} = Guild["members"];
     let Member = cache.get(Id);
-    if (Member?.kickable) {
+    if (Member ? Member.kickable : undefined) {
         Member.kick().catch(() => false);
     }
     if (close === true) await closeAllPermissions(Guild);
