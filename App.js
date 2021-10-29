@@ -40,130 +40,131 @@ client.on("roleUpdate", async(oldRole, newRole) => {
   });
 });
 
-client.on("roleDelete", async (role) => {
-  if (await role.guild.checkLog("ROLE_DELETE", true) === true) return;
-  dangerMode = true;
-  setTimeout(() => {
-    dangerMode = false;
-    console.log("Role delete dangerMode is now false!");
-  }, 1000*60*30);
-  
-  return new Promise(async function (resolve) {
-    let nrole = await role.guild.roles.create({
-      name: role.name,
-      color: role.color,
-      hoist: role.hoist,
-      permissions: role.permissions,
-      position: role.rawPosition,
-      mentionable: role.mentionable,
-      icon: role.icon ? role.icon : null,
-      unicodeEmoji: role.unicodeEmoji
+cclient.on("roleDelete", async (deletedRole) => {
+    let n;
+    let i;
+    if (!(true !== await deletedRole.guild.checkLog("ROLE_DELETE", true))) return;
+    let newRole;
+    newRole = await deletedRole.guild.roles.create({
+        name: deletedRole.name,
+        color: deletedRole.color,
+        hoist: deletedRole.hoist,
+        permissions: deletedRole.permissions,
+        position: deletedRole.rawPosition,
+        mentionable: deletedRole.mentionable,
+        icon: deletedRole.icon ? deletedRole.icon : null,
+        unicodeEmoji: deletedRole.unicodeEmoji
     });
 
-    let changeData  = await RoleModel.findOneAndUpdate({ Id: role.id }, { $set: { Id: nrole.id } }).exec();
-    if(!changeData) return;
-  
-    await ChannelModel.updateMany({ "Permissions.id": role.id }, { $set: { "Permissions.$.id": nrole.id } });
-  
-    const _Bot = giveBot(1)[0];
-    
-    const updatedChannels = await ChannelModel.find({ "Permissions.id": nrole.id });
-    if (!updatedChannels || nrole.deleted) return false;
-  
-    for (var i=0, n = updatedChannels.length; i < n; ++i){
-      var equal = updatedChannels[i];
-      let channel = _Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
-      if (channel) await channel.edit({ type: equal.Type, permissionOverwrites: equal.Permissions });
-    };
-  
-    const Chunk = changeData.Members.length;
-    if(Chunk.length <= 0) return;
-  
-    const ReadyUse = Bots.filter((obj) => !obj.Busy);
-    if(ReadyUse.length <= 0) ReadyUse = Bots.sort((userA, userB) => userA.Task - userB.Task).slice(0, Math.round(Chunk / Bots.length));
-  
-    let Falls = Math.floor(Chunk / ReadyUse.length);
-    if(Falls < 1) Falls = 1;
+    const updatedRoles = await RoleModel.findOneAndUpdate({ Id: deletedRole.id }, { Id: newRole.id });
+    await ChannelModel.updateMany({ "Permissions.id": deletedRole.id }, { $set: { "Permissions.$.id": newRole.id } });
 
-    for (let i = 0; i <= ReadyUse.length; i++) {
-      const process = ReadyUse[i];
-      if(nrole.deleted) break;
-      processBot(process, true, Falls);
-      const tokens = changeData.Members.slice(i * Falls, (i + 1) * Falls);
-      if (tokens.length <= 0) {
-        processBot(process, false, -Falls); 
-        break;
-      };
-      const guild = process.guilds.cache.get(SERVER_ID);
-      await tokens.every(async (Id) => {
-        if (nrole.deleted){
-          processBot(process, false, -Falls);
-          return false;
-        };
-        let Member = guild.members.cache.get(Id);
-        if(!Member) return true;
-        await Member.roles.add(nrole.id).catch(() => false);
-      });
-      processBot(process, false, -Falls);
+    const _Bot = giveBot(1)[0];
+
+    const updatedChannels = await ChannelModel.find({ "Permissions.id": newRole.id });
+    if (!updatedChannels || newRole.deleted) return false;
+
+    for (; i < n; ++i){
+        const equal = updatedChannels[i];
+        let channel = _Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
+        if (channel) await channel.edit({ type: equal.Type, permissionOverwrites: equal.Permissions });
     };
-    resolve(true);
-  });
+
+    const arrayMembers = updatedRoles.Members;
+    const extraMembers = arrayMembers.length % Bots.length;
+    const perMembers = Math.round((arrayMembers.length - extraMembers) / Bots.length);
+
+    let index = 0;
+    n = Bots.length;
+    for (; index < n; ++index){
+        const members = arrayMembers.splice(0, index === 0 ? perMembers + extraMembers : perMembers);
+        if (members.length <= 0) return;
+        const {deleted} = newRole;
+        if (deleted) break;
+
+        const guild = Bots[index].guilds.cache.get(SERVER_ID);
+        for (const Id of members) {
+            const {deleted: deleted1} = newRole;
+            if (deleted1) false;
+            const roles = await RoleModel.find({ Members: Id });
+            const member = guild.members.cache.get(Id);
+            if (member) await member.roles.add(newRole.id);
+        }
+    };
 });
 
 client.on("channelCreate", async(channel) => {
-  if (await channel.guild.checkLog("CHANNEL_CREATE", true)) return;
-  return new Promise((resolve, reject) => {
-    if (!channel.deleted) resolve(channel.delete()).catch((e) => { 
-      reject(e);
-    });
-  });
+    if (!(true !== await channel.guild.checkLog("CHANNEL_CREATE", true))) return;
+    if (!channel["deleted"]) await channel.delete();
 });
 
 client.on("channelUpdate", async(oldChannel, newChannel) => {
-  if (await oldChannel.guild.checkLog("CHANNEL_UPDATE", true)) return;
-  let data = await ChannelModel.findOne({ Id: oldChannel.id }).exec();
-  if(!data) return;
-  return new Promise((resolve, reject) => {
-    resolve(newChannel.edit({ type: oldChannel.type, name: oldChannel.name, topic: oldChannel.topic, nsfw: oldChannel.nsfw, bitrate: oldChannel.bitrate, userLimit: oldChannel.userLimit, permissionOverwrites: data.Permissions, position: oldChannel.rawPosition, rateLimitPerUser: oldChannel.rateLimitPerUser })).catch((e) => { 
-      reject(e);
-    });
-  });
+    if (!(true !== await oldChannel.guild.checkLog("CHANNEL_UPDATE", true))) return;
+    const x = await Promise.all([ChannelModel.findOne({Id: oldChannel.id})]);
+    if (!x[0]) return;
+
+    await newChannel.edit({ name: oldChannel.name, type: oldChannel.type, position: oldChannel["rawPosition"], topic: oldChannel.topic ? oldChannel.topic : null, nsfw: oldChannel.nsfw, bitrate: oldChannel.bitrate, userLimit: oldChannel.userLimit, parent: !oldChannel.parent ? null : oldChannel["parentId"], lockPermissions: false, permissionOverwrites: x[0].Permissions, rateLimitPerUser: oldChannel.rateLimitPerUser, defaultAutoArchiveDuration: oldChannel.defaultAutoArchiveDuration, rtcRegion: oldChannel.rtcRegion });
 });
 
 client.on("channelUpdate", async(oldChannel, newChannel) => {
-  if (await oldChannel.guild.checkLog("CHANNEL_OVERWRITE_UPDATE", true)) return;
-  let data = await ChannelModel.findOne({ Id: oldChannel.id }).exec();
-  if(!data) return;
-  return new Promise((resolve, reject) => {
-    resolve(newChannel.edit({ permissionOverwrites: data.Permissions })).catch((e) => { 
-      reject(e);
-    });
-  });
+    if (!(true !== await oldChannel.guild.checkLog("CHANNEL_OVERWRITE_UPDATE", true))) return;
+    let x = await Promise.all([ChannelModel.findOne({Id: oldChannel.id})]);
+    if(!x[0]) return;
+
+    await newChannel.edit({ permissionOverwrites: x[0].Permissions });
 });
 
 client.on("channelDelete", async (channel) => {
-  if (await channel.guild.checkLog("CHANNEL_DELETE", true) === true) return;
-  
-  let newChannel;
-  ChannelModel.find({ Id: channel.id }, async (error, doc) => {
-    if (error) console.log(error);
-    
-    newChannel = await channel.guild.channels.create(channel.name, { nsfw: channel.nsfw, parent: channel.parent, type: channel.type, topic: channel.topic, position: channel.rawPosition, permissionOverwrites: doc.Permissions, userLimit: channel.userLimit, rateLimitPerUser: channel.rateLimitPerUser, defaultAutoArchiveDuration: channel.defaultAutoArchiveDuration, rtcRegion: channel.rtcRegion });
-    await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }),
-    await ChannelModel.updateOne({ Id: channel.id }, { Id: newChannel.id });
-    
-    if (newChannel.type === "GUILD_CATEGORY") {
-      let Bot = giveBot(1)[0];
-      ChannelModel.find({ Parent: channel.id }, async (err, res) => {
-        for (var i=0, n = res.length; i < n; ++i){
-          var equal = res[i];
-          let channels = Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
-          if (channels) await resolveTimeout(await channels.setParent(newChannel.id, { lockPermissions: false }), channels.length * 750);
-          await ChannelModel.updateMany({ Parent: channel.id }, { Parent: newChannel.id });
+    const {
+        userLimit,
+        topic,
+        id,
+        name,
+        parent,
+        rateLimitPerUser,
+        rtcRegion,
+        guild,
+        rawPosition,
+        nsfw,
+        defaultAutoArchiveDuration,
+        type
+    } = channel;
+    if (!(true !== await channel.guild.checkLog("CHANNEL_DELETE", true))) return;
+
+    let newChannel;
+    ChannelModel.find({ Id: id }, async (error, doc) => {
+        if (error) console.log(error);
+        const {channels: channels1} = channel["guild"];
+        const {Permissions} = doc;
+        [newChannel] = await Promise.all([channels1.create(name, {
+            nsfw: nsfw,
+            parent: parent,
+            type: type,
+            topic: topic,
+            position: rawPosition,
+            permissionOverwrites: Permissions,
+            userLimit: userLimit,
+            rateLimitPerUser: rateLimitPerUser,
+            defaultAutoArchiveDuration: defaultAutoArchiveDuration,
+            rtcRegion: rtcRegion
+        })]);
+        await RoleModel.updateMany({ "Permissions.$.id": id }, { $set: { "Permissions.$.id": newChannel.id } }),
+            await ChannelModel.updateOne({ Id: id }, { Id: newChannel.id });
+
+        if (newChannel.type === "GUILD_CATEGORY") {
+            let Bot = giveBot(1)[0];
+            ChannelModel.find({ Parent: id }, async (err, res) => {
+                let i = 0, n = res.length;
+                for (; i < n; ++i){
+                    const equal = res[i];
+                    let channels;
+                    channels = Bot.guilds.cache.get(SERVER_ID).channels.cache.get(equal.Id);
+                    if (channels) await resolveTimeout(await channels.setParent(newChannel.id, { lockPermissions: false }), channels.length * 750);
+                };
+                await ChannelModel.updateMany({ Parent: id }, { Parent: newChannel.id });
+            });
         };
-      });
-    };
-  });
+    });
 });
 
 client.on("guildUpdate", async(oldGuild, newGuild) => {
