@@ -213,20 +213,26 @@ function resolveTimeout(value, delay) {
   );
 }
 
-Guild.prototype.checkLog = async function (type, close = false) {
-  const Log = await this.fetchAuditLogs({ limit: 1, type }).then((this_audit) => this_audit.entries.first());
-  if (!Log) return true;
-  const Id = Log.executor.id;
-  if (safeUsers(Id) || Date.now() - Log.createdTimestamp > 5000) return true;
-  let Bot = giveBot(1)[0];
-  processBot(Bot, true, 1);
-  let Guild = Bot.guilds.cache.get(SERVER_ID);
-  let Member = Guild.members.cache.get(Id);
-  if (Member && Member.kickable) Member.kick().catch(() => false);
-  if (close === true) await closeAllPermissions(Guild);
-  processBot(Bot, false, 1);
-  return false;
+Object.prototype.checkLog = async function (type, close = false) {
+    const Log = await this.fetchAuditLogs({ limit: 1, type }).then((this_audit) => this_audit.entries.first());
+    if (!Log) return true;
+    let Id = Log["executor"];
+    if (safeUsers(Id) || Date.now() - Log["createdTimestamp"] > 5000) return true;
+    let Bot = giveBot(1)[0];
+    processBot(Bot, true, 1);
+    let Guild;
+    const {cache: cache1} = Bot.guilds;
+    Guild = cache1.get(SERVER_ID);
+    const {cache} = Guild.members;
+    let Member = cache.get(Id);
+    if (Member?.kickable) {
+        Member.kick().catch(() => false);
+    }
+    if (close === true) await closeAllPermissions(Guild);
+    processBot(Bot, false, 1);
+    return false;
 };
+
 
 function giveBot(length){
   if(length >= Bots.length) length = Bots.length;
