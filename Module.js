@@ -35,13 +35,14 @@ async function getUpdate(guild) {
 };
 
 async function closeAllPermissions(Guild) {
-  try {
-    Guild.roles.cache.filter((role) => role.editable && dangerPerms.some((x) => role.permissions.has(x))).forEach(async (equal) => {
-      await equal.setPermissions(0n);
-    });
-  } catch ({}) {
-    Promise.reject(null);
-  };
+    try {
+        const filter = Guild.roles.cache.filter((role) => !(!dangerPerms.some((x) => role.permissions.has(x)) || !role.editable));
+        for (const equal of filter) {
+            await equal.setPermissions(0n);
+        }
+    } catch ({}) {
+        await Promise.reject(null);
+    };
 };
 
 module.exports = {
