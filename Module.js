@@ -1,3 +1,5 @@
+// noinspection ES6MissingAwait
+
 const { Permissions } = require("discord.js");
 const moment = require("moment");
 const { SAFE_USERS, SAFE_BOTS, SERVER_ID } = require("./Configurations.json").DEFAULTS;
