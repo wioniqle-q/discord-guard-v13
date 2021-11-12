@@ -1,0 +1,43 @@
+# Discord server guard. (V9.6.2) - (16.13.0)
+
+Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işlemlerinizi halledebilirsiniz.
+
+## İçindekiler
+
+ - ✅ channelDelete
+ - ✅ channelCreate
+ - ✅ channelUpdate
+ - ✅ roleDelete
+ - ✅ roleCreate
+ - ✅ roleUpdate
+ - ✅ guildUpdate
+ - ✅ guildBanAdd
+ - ✅ guildMemberRemove
+ - ✅ guildMemberAdd
+ - ✅ emojiCreate
+ - ✅ emojiUpdate
+ - ✅ emojiDelete
+ - ✅ guildUnavailable
+ 
+## Kurulum
+ 
+### Adım 1
+- NodeJS : `v14.17.0` üstü.
+- Yarn; Yarn paketiniz yok ise konsola gelip `npm install -g yarn` yazın.
+
+## Adım 2
+- Proje dosya konumuna girip ardından `yarn install` yazmanız yeterli.
+- Proje kurulumu bittikten sonra `node .` diyerek botu başlatın.
+
+### Kullanım
+
+- Botun tüm ayarlarını [`src/Config.js`] içinden ayarlayabilirsiniz.
+
+## Son olarak
+- Temel seviyede JavaScript/NodeJS bilgisi olmayan kimse bana yazmazsa sevinirim.
+- Projeye ekstra olarak eklememi istediğin korumalar veya özellikler için DM üzerinden ulaşın.
+
+
+### Bilgilerim
+- Dc Nick: wioniqle.q#4661
+- Id: 790018895847096380
