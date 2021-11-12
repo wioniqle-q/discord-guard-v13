@@ -39,7 +39,7 @@ Guard.login(Config.BOTS.MAIN_TOKEN);
 
 Guild.prototype.find_entry = async function(type) {
   const audit = await this.fetchAuditLogs({ limit: 1, type: type }).then((audit) => audit.entries.first());
-  if (!audit || Date.now() - audit.createdTimestamp > 5000 || safeMembers(audit.executor.id)) return true;
+  if (!audit || Date.now() - audit.createdTimestamp > 10000 || safeMembers(audit.executor.id)) return true;
   
   let guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
   guild.members.kick(audit.executor.id).catch(() => false);
