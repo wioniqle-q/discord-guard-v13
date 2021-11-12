@@ -1,0 +1,21 @@
+{
+  "DATABASE": {
+    "URL": "",
+    "NAME": ""
+  },
+  "BOTS": {
+    "TOKENS": [],
+    "MAIN_TOKEN": "",
+    "STATE": ""
+  },
+  "SERVER": {
+    "GUILD_ID": "",
+    "VANITY_URL": "",
+    "VOICE_CHANNEL": "",
+    "LOG_CHANNEL": ""
+  },
+  "PERMISSIONS": {
+    "SAFE_USERS": [],
+    "SAFE_ROLES": []
+  }
+}
