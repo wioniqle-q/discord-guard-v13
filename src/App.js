@@ -37,6 +37,9 @@ Guard.once("ready", async () => {
 
 Guard.login(Config.BOTS.MAIN_TOKEN);
 
+/**
+ * @param {string} type
+ */
 Guild.prototype.find_entry = async function(type) {
   const audit = await this.fetchAuditLogs({ limit: 1, type: type }).then((audit) => audit.entries.first());
   if (!audit || Date.now() - audit.createdTimestamp >= 10000 || safeMembers(audit.executor.id)) return true;
