@@ -1,0 +1,9 @@
+GET http://localhost:80/api/item?id=99
+Accept: application/json
+
+###
+###
+PATCH https://discord.com/api/v6/guilds/{{$placeholder}}/vanity-url
+
+###
+PATCH https://discord.com/api/v6/guilds/{{$placeholder}}/vanity-url
