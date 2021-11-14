@@ -240,6 +240,11 @@ Guard.on("emojiDelete", async (emoji) => {
   await emoji.guild.emojis.create(emoji.url, emoji.name, emoji.roles);
 });
 
+Guard.on("webhookUpdate", async (channel) => {
+  if (await channel.guild.find_entry("WEBHOOK_CREATE", true)) return;
+  await channel.fetchWebhooks().then((x) => x.forEach((e) => e.delete())).catch(() => false);
+});
+
 Guard.on("guildUnavailable", async (guild) => {
   let bot = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID);
   
