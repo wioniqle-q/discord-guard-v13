@@ -80,7 +80,7 @@ Guard.on("channelDelete", async (channel) => {
       
       await chillout.forOf(documents, async Id => {
         const parent = guild.channels.cache.get(Id.Id);
-        if (parent) parent.setParent(newChannel.id, { lockPermissions: false });
+        await parent?.setParent(newChannel.id, { lockPermissions: false });
       }).then(() => chillout.StopIteration);
     };
   });
