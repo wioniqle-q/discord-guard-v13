@@ -158,7 +158,7 @@ Guard.on("roleDelete", async (role) => {
     const guild = Guards[i].guilds.cache.get(Config.SERVER.GUILD_ID);
     await chillout.forEach(members, async Id => {
       const member = await guild.members.cache.get(Id);
-      if (member) await member.roles.add(newRole.id);
+      await member?.roles.add(newRole.id);
     }).then(() => chillout.StopIteration);
   };
 });
