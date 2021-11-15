@@ -4,16 +4,14 @@ const Guard = global.Guard;
 const Guards = global.Guards;
 
 function createIndex(type) {
-  if (type >= Guards.length) type = Guards.length;
-  let x = Guards.filter((x) => !x.Sleep);
-  if (x.length == 0) x = Guards.sort((a,z) => a.Thread - z.Thread).slice(0, type);
-  return x;
-};
+  let filter = Guards.filter((x) => !x.Sleep).reverse().sort();
+  return filter;
+}
 
 function safeMembers(type) {
-  if (type === Guard.user.id || Guards.some((x) => x.user.id == type) || Config.PERMISSIONS.SAFE_USERS.includes(type) || Config.PERMISSIONS.SAFE_ROLES.some((x) => type.roles.cache.has(x))) return true;
+  if (type === Guard.user.id || Guards.some((x) => x.user.id === type) || Config.PERMISSIONS.SAFE_USERS.includes(type) || Config.PERMISSIONS.SAFE_ROLES.some((x) => type.roles.cache.has(x))) return true;
   return false;
- };
+}
 
 function thread(msec) {
   return new Promise(resolve => setTimeout(resolve, msec));
