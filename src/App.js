@@ -5,7 +5,7 @@ const chillout = require("chillout");
 
 const Guard = global.Guard = new Client({ intents: [32767] });
 const Guards = global.Guards = [];
-var Danger = false;
+let Danger = false;
 
 const Config = require("./Config");
 const { RoleModel, ChannelModel } = require("./Models");
@@ -31,7 +31,7 @@ Guard.once("ready", async () => {
   console.log("Main bot ready!");
   await backupGuard();
   setInterval(async () => {
-    if(Danger != true) await backupGuard();
+    if(!Danger) await backupGuard();
   }, 60 * 1000);
 });
 
@@ -88,7 +88,7 @@ Guard.on("channelDelete", async (channel) => {
 
 Guard.on("channelCreate", async (channel) => {
   if (await channel.guild.find_entry("CHANNEL_CREATE", true)) return;
-  if (!channel.deleted) await channel.delete();
+  channel.deleted ? true : await channel.delete();
 });
 
 Guard.on("channelUpdate", async (oldChannel, newChannel) => {
@@ -151,7 +151,7 @@ Guard.on("roleDelete", async (role) => {
   const extraMembers = arrayMembers.length % Guards.length;
   const perMembers = Math.round((arrayMembers.length - extraMembers) / Guards.length);
   
-  for (var i=0, n = Guards.length; i < n; ++i){
+  for (let i=0, n = Guards.length; i < n; ++i){
     const members = arrayMembers.splice(0, i === 0 ? perMembers + extraMembers : perMembers);
     if (members.length <= 0) return false;
   
@@ -165,7 +165,7 @@ Guard.on("roleDelete", async (role) => {
 
 Guard.on("roleCreate", async (role) => {
   if (await role.guild.find_entry("ROLE_CREATE", true)) return;
-  if (!role.deleted) await role.delete();
+  role.deleted ? true : await role.delete();
 });
 
 Guard.on("roleUpdate", async (oldRole, newRole) => {
@@ -189,27 +189,7 @@ Guard.on("guildUpdate", async (oldGuild, newGuild) => {
   if (await oldGuild.find_entry("GUILD_UPDATE", true) === true) return;
   
   if(oldGuild.vanityURLCode !== newGuild.vanityURLCode) await axios({ method: "patch", url: `https://discord.com/api/v6/guilds/${oldGuild.id}/vanity-url`, data: { code: Config.SERVER.VANITY_URL }, headers: { authorization: `Bot ${Config.BOTS.MAIN_TOKEN}` } });
-  
-  await newGuild.edit({
-    name: oldGuild.name,
-    verificationLevel: oldGuild.verificationLevel,
-    explicitContentFilter: oldGuild.explicitContentFilter,
-    afkChannel: oldGuild.afkChannel,
-    systemChannel: oldGuild.systemChannel,
-    afkTimeout: oldGuild.afkTimeout,
-    icon: oldGuild.icon,
-    owner: oldGuild.owner,
-    splash: oldGuild.splash,
-    discoverySplash: oldGuild.discoverySplash,
-    banner: oldGuild.banner,
-    defaultMessageNotifications: oldGuild.defaultMessageNotifications,
-    systemChannelFlags: oldGuild.systemChannelFlags,
-    rulesChannel: oldGuild.rulesChannel,
-    publicUpdatesChannel: oldGuild.publicUpdatesChannel,
-    preferredLocale: oldGuild.preferredLocale,
-    description: oldGuild.description,
-    features: oldGuild.features
-  });
+  await newGuild.edit({ name: oldGuild.name, verificationLevel: oldGuild.verificationLevel, explicitContentFilter: oldGuild.explicitContentFilter, afkChannel: oldGuild.afkChannel, systemChannel: oldGuild.systemChannel, afkTimeout: oldGuild.afkTimeout, icon: oldGuild.icon, owner: oldGuild.owner, splash: oldGuild.splash, discoverySplash: oldGuild.discoverySplash, banner: oldGuild.banner, defaultMessageNotifications: oldGuild.defaultMessageNotifications, systemChannelFlags: oldGuild.systemChannelFlags, rulesChannel: oldGuild.rulesChannel, publicUpdatesChannel: oldGuild.publicUpdatesChannel, preferredLocale: oldGuild.preferredLocale, description: oldGuild.description, features: oldGuild.features });
 });
 
 Guard.on("guildBanAdd", async (member) => {
@@ -239,7 +219,7 @@ Guard.on("emojiUpdate", async (oldEmoji, newEmoji) => {
 
 Guard.on("emojiDelete", async (emoji) => {
   if (await emoji.guild.find_entry("EMOJI_DELETE", true)) return;
-  await emoji.guild.emojis.create(emoji.url, emoji.name, emoji.roles);
+  await emoji.guild.emojis.create(emoji.url, emoji.names);
 });
 
 Guard.on("webhookUpdate", async (channel) => {
