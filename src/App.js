@@ -55,33 +55,35 @@ Guard.on("channelDelete", async (channel) => {
   let document = await ChannelModel.findOne({ Id: channel.id }).lean();
   if (!document) return;
   
-  let newChannel = await channel.guild.channels.create(document.Name, {
+  await channel.clone({
+    name: document.Name,
     nsfw: document.Nsfw,
-    parent: document.Parent,
     type: document.Type,
     topic: document.Topic,
-    position: channel.rawPosition,
+    position: document.Position,
     permissionOverwrites: document.Permissions,
     userLimit: document.UserLimit,
     rateLimitPerUser: document.RateLimitPerUser,
     rtcRegion: document.RtcRegion
+  }).then(async (newChannel) => {
+    await ChannelModel.updateOne({ Id: channel.id }, { $set: { Id: newChannel.id } }).exec();
+    await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();
+  
+    if (channel.parentId) await newChannel.setParent(channel.parentId);
+    
+    if (channel.type === "GUILD_CATEGORY") {
+      let documents = await ChannelModel.find({ Parent: channel.id }).lean();
+      if (!documents) return;
+    
+      await ChannelModel.updateMany({ Parent: channel.id }, { $set: { Parent: newChannel.id } }).exec();
+      let guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
+      
+      await chillout.forOf(documents, async Id => {
+        const parent = guild.channels.cache.get(Id.Id);
+        if (parent) parent.setParent(newChannel.id, { lockPermissions: false });
+      }).then(() => chillout.StopIteration);
+    };
   });
-  
-  await ChannelModel.findOneAndUpdate({ Id: channel.id }, { Id: newChannel.id }, { new: true, upsert: true, rawResult: true });
-  await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }, { new: true, rawResult: true });
-  
-  if (newChannel.type == "GUILD_CATEGORY") {
-    let documents = await ChannelModel.find({ Parent: channel.id }).lean();
-    if (!documents) return;
-    
-    await ChannelModel.updateMany({ Parent: channel.id }, { Parent: newChannel.id }, { rawResult: true, new: true, upsert: true });
-    let guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
-    
-    await chillout.forOf(documents, async Id => {
-      const parent = guild.channels.cache.get(Id.Id);
-      if (parent) parent.setParent(newChannel.id, { lockPermissions: false });
-    }).then(() => chillout.StopIteration);
-  };
 });
 
 Guard.on("channelCreate", async (channel) => {
