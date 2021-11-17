@@ -1,4 +1,4 @@
-# Discord server guard. (V9.6.2) - (16.13.0)
+# Discord server guard. (V9.7.5) - (16.13.0)
 
 Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işlemlerinizi halledebilirsiniz. Şu anda github'da Türkler tarafından yayınlanan guardlar arasında 1.ci diyebilirim. Gönül rahatlığı ile sununcunuzu koruyabilirsiniz.
 
