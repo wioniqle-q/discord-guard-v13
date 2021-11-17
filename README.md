@@ -1,6 +1,6 @@
 # Discord server guard. (V9.6.2) - (16.13.0)
 
-Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işlemlerinizi halledebilirsiniz.
+Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işlemlerinizi halledebilirsiniz. Şu anda github'da Türkler tarafından yayınlanan guardlar arasında 1.ci diyebilirim. Gönül rahatlığı ile sununcunuzu koruyabilirsiniz.
 
 ## İçindekiler
 
@@ -18,6 +18,12 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - ✅ emojiUpdate
  - ✅ emojiDelete
  - ✅ guildUnavailable
+ 
+## Güncelleneler
+ -- Package.json
+ -- src/App.js
+ -- src/Splash.js
+ -- Added a some new stuff
  
 ## Kurulum
  
