@@ -89,8 +89,9 @@ Guard.on("channelDelete", async (channel) => {
 });
 
 Guard.on("channelCreate", async (channel) => {
+  if (channel.deleted) return;
   if (await channel.guild.find_entry("CHANNEL_CREATE", true)) return;
-  channel.deleted ? true : await channel.delete();
+  await channel.delete();
 });
 
 Guard.on("channelUpdate", async (oldChannel, newChannel) => {
@@ -170,8 +171,9 @@ Guard.on("roleDelete", async (role) => {
 });
 
 Guard.on("roleCreate", async (role) => {
+  if (role.deleted) return;
   if (await role.guild.find_entry("ROLE_CREATE", true)) return;
-  role.deleted ? true : await role.delete(); 
+  await role.delete(); 
 });
 
 Guard.on("roleUpdate", async (oldRole, newRole) => {
