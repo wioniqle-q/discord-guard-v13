@@ -1,6 +1,6 @@
 {
   "name": "wio-client",
-  "version": "9.6.2",
+  "version": "9.7.5",
   "description": "Wio client",
   "main": "src/App.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "discord.js": "^13.3.1",
     "axios": "^0.24.0",
     "chillout": "^5.0.0",
-    "mongoose": "^6.0.12"
+    "mongoose": "^6.0.13"
   },
   "engines": {
     "node": "16.13.0"
