@@ -18,7 +18,8 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - ✅ emojiUpdate
  - ✅ emojiDelete
  - ✅ guildUnavailable
- 
+ - ✅ webhookUpdate
+  
 ## Güncelleneler
  -- Package.json
  -- src/App.js
