@@ -113,7 +113,6 @@ Guard.on("channelUpdate", async (oldChannel, newChannel) => {
     rateLimitPerUser: oldChannel.rateLimitPerUser,
     defaultAutoArchiveDuration: oldChannel.defaultAutoArchiveDuration,
     rtcRegion: oldChannel.rtcRegion
-
   });
 });
 
