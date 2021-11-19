@@ -179,12 +179,10 @@ Guard.on("roleCreate", async (role) => {
 Guard.on("roleUpdate", async (oldRole, newRole) => {
   if (await oldRole.guild.find_entry("ROLE_UPDATE", true)) return;
   
-  let bot = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID);
-  await bot.roles.edit(newRole.id, {
+  await newRole.edit({
     name: oldRole.name,
     color: oldRole.color,
     hoist: oldRole.hoist,
-    position: oldRole.rawPosition,
     permissions: oldRole.permissions,
     mentionable: oldRole.mentionable,
     icon: oldRole.icon,
