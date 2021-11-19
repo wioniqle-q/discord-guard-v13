@@ -31,7 +31,8 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - Auditin geç algılatması bugu.
  - Hata ayıklayıcı.
  - Sekme bugları.
- 
+ - Rol yetki düzenleyip silme bugu.
+
 ## Kurulum
  
 ### Adım 1
