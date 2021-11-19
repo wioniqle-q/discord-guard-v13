@@ -4,7 +4,7 @@ const Guard = global.Guard;
 const Guards = global.Guards;
 
 function createIndex(type) {
-  let filter = Guards.filter((x) => !x.Sleep).reverse().sort();
+  let filter = Guards.filter((x) => !x.Sleep);
   return filter;
 }
 
