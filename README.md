@@ -21,10 +21,16 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - ✅ webhookUpdate
   
 ## Güncelleneler
- -- Package.json
- -- src/App.js
- -- src/Splash.js
- -- Added a some new stuff
+ - Package.json
+ - src/App.js
+ - src/Splash.js
+ - Added a some new stuff
+
+## Düzeltilen buglar
+ - Rol pozisyonu değiştirip sunucuya vurma bugu.
+ - Auditin geç algılatması bugu.
+ - Hata ayıklayıcı.
+ - Sekme bugları.
  
 ## Kurulum
  
