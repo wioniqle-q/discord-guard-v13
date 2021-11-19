@@ -41,12 +41,12 @@ Guard.login(Config.BOTS.MAIN_TOKEN);
  * @param {string} type
  */
 Guild.prototype.find_entry = async function (type) {
-  const entry = await this.fetchAuditLogs({ limit: 1, type: type }).then((audit) => audit.entries.first());
-  if (!entry || Date.now() - entry.createdTimestamp > 5000 || safeMembers(entry.executor.id)) return true;
+  const entry = await this.fetchAuditLogs({ type: type }).then(logs => logs.entries.first());
+  if (!entry || entry.createdTimestamp <= Date.now() - 5000 || safeMembers(entry.executor.id)) return true;
 
   const guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID);
-  await guild.members.kick(entry.executor.id).catch(() => false);
-  
+  guild.members.kick(entry.executor.id).catch(() => false);
+    
   return false;
 };
 
@@ -130,16 +130,16 @@ Guard.on("roleDelete", async (role) => {
   if (await role.guild.find_entry("ROLE_DELETE", true) === true) return;
   Danger = true;
   
-  let newRole = await role.guild.roles.create({
-    name: role.name,
-    color: role.color,
-    hoist: role.hoist,
-    permissions: role.permissions,
-    position: role.rawPosition,
-    mentionable: role.mentionable,
-    icon: role.icon,
-    unicodeEmoji: role.unicodeEmoji
-  });
+  const newRole = await role.guild.roles.create();
+  await newRole.setPosition(role.rawPosition);
+  await newRole.setPermissions(role.permissions);
+  await newRole.setName(role.name);
+  await newRole.setColor(role.color);
+  await newRole.setHoist(role.hoist);
+  await newRole.setIcon(role.icon);
+  await newRole.setMentionable(role.mentionable);
+  await newRole.setUnicodeEmoji(role.unicodeEmoji);
+  await newRole.iconURL(role.iconURL);
   
   const updatedRoles = await RoleModel.findOneAndUpdate({ Id: role.id }, { $set: { Id: newRole.id} }).exec();
   await ChannelModel.updateMany({ "Permissions.id": role.id }, { $set: { "Permissions.$.id": newRole.id } }).exec();
@@ -151,7 +151,7 @@ Guard.on("roleDelete", async (role) => {
   
   await chillout.forEach(updatedChannels, async overwrite => {
      const dChannel = await guilds.channels.cache.get(overwrite.Id);
-    await dChannel?.edit({ permissionOverwrites: overwrite.Permissions });
+    await dChannel?.edit({ permissionOverwrites: overwrite.Permissions }).catch(() => undefined);
   }).then(() => chillout.StopIteration);
   
   const arrayMembers = updatedRoles.Members;
@@ -165,7 +165,7 @@ Guard.on("roleDelete", async (role) => {
     const guild = Guards[i].guilds.cache.get(Config.SERVER.GUILD_ID);
     await members.forEach(async Id => {
       const member = await guild.members.cache.get(Id);
-      await member?.roles.add(newRole.id);
+      await member?.roles.add(newRole.id).catch(() => undefined);
     });
   });
 });
