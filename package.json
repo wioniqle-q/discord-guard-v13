@@ -1,6 +1,6 @@
 {
   "name": "wio-client",
-  "version": "9.7.5",
+  "version": "9.8.6",
   "description": "Wio client",
   "main": "src/App.js",
   "scripts": {
