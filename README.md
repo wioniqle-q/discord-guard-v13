@@ -19,13 +19,14 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - ✅ emojiDelete
  - ✅ guildUnavailable
  - ✅ webhookUpdate
+ - 
  - ❌ InviteDelete
  - ❌ InviteCreate
  - ❌ guildBanRemove
  - ❌ integrationCreate
  - ❌ integrationUpdate
  - ❌ integrationDelete
- - 
+ 
 ## Güncelleneler
  - Package.json
  - src/App.js
