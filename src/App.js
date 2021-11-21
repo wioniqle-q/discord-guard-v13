@@ -163,8 +163,8 @@ Guard.on("roleDelete", async (role) => {
     if (members.length <= 0) return false;
     
     const guild = Guards[i].guilds.cache.get(Config.SERVER.GUILD_ID);
-    await members.forEach(async function (Id) {
-      const [member] = await Promise.all([guild.members.cache.get(Id)]);
+    await members.forEach(async (Id) => {
+      const member = await guild.members.cache.get(Id);
       await member?.roles.add(newRole.id).catch(() => undefined);
     });
   });
