@@ -52,12 +52,13 @@ Guild.prototype.find_entry = async function (type) {
 
 Guard.on("channelDelete", async (channel) => {
   if (await channel.guild.find_entry("CHANNEL_DELETE", true) === true) return;
+
   Danger = true;
   
-  let document = await ChannelModel.findOne({ Id: channel.id }).lean();
+  let document = await ChannelModel.findOne({ Id: channel.id }).lean().exec();
   if (!document) return;
   
-  await channel.clone({
+  var newChannel = await channel.clone({
     name: document.Name,
     nsfw: document.Nsfw,
     type: document.Type,
@@ -67,25 +68,28 @@ Guard.on("channelDelete", async (channel) => {
     userLimit: document.UserLimit,
     rateLimitPerUser: document.RateLimitPerUser,
     rtcRegion: document.RtcRegion
-  }).then(async (newChannel) => {
-    await ChannelModel.updateOne({ Id: channel.id }, { $set: { Id: newChannel.id } }).exec();
-    await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();
+  }).then((e) => e);
   
-    if (channel.parentId) await newChannel.setParent(channel.parentId);
-    
-    if (channel.type === "GUILD_CATEGORY") {
+  if (channel.parentId) return await newChannel.setParent(channel.parentId);
+  await ChannelModel.updateOne({ Id: channel.id }, { $set: { Id: newChannel.id } }).exec();
+  await RoleModel.updateMany({ "Permissions.$.id": channel.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();
+  
+  switch(channel.type) {
+    case "GUILD_CATEGORY": 
       let documents = await ChannelModel.find({ Parent: channel.id }).lean();
       if (!documents) return;
-    
+      
       await ChannelModel.updateMany({ Parent: channel.id }, { $set: { Parent: newChannel.id } }).exec();
       let guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
       
-      await chillout.forEach(documents, async Id => {
-        const parent = guild.channels.cache.get(Id.Id);
-        await parent?.setParent(newChannel.id, { lockPermissions: false });
-      }).then(() => chillout.StopIteration);
-    };
-  });
+      return documents.reduce(function (promise, item) {
+        return promise.then(async function () {
+          const parent = guild.channels.cache.get(item.Id);
+          await parent?.setParent(newChannel.id, { lockPermissions: false });
+        });
+      }, Promise.resolve());
+      break;
+  }
 });
 
 Guard.on("channelCreate", async (channel) => {
@@ -144,15 +148,17 @@ Guard.on("roleDelete", async (role) => {
   const updatedRoles = await RoleModel.findOneAndUpdate({ Id: role.id }, { $set: { Id: newRole.id} }).exec();
   await ChannelModel.updateMany({ "Permissions.id": role.id }, { $set: { "Permissions.$.id": newRole.id } }).exec();
   
-  const updatedChannels = await ChannelModel.find({ "Permissions.id": newRole.id }).lean();
+  const updatedChannels = await ChannelModel.find({ "Permissions.id": newRole.id }).lean().exec();
   if (!updatedChannels || newRole.deleted) return false;
   
   const guilds = await createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID);
   
-  await chillout.forEach(updatedChannels, async overwrite => {
-     const dChannel = await guilds.channels.cache.get(overwrite.Id);
-    await dChannel?.edit({ permissionOverwrites: overwrite.Permissions }).catch(() => undefined);
-  }).then(() => chillout.StopIteration);
+  return updatedChannels.reduce(function (promise, item) {
+    return promise.then(async function () {
+      const dChannel = await guilds.channels.cache.get(item.Id);
+      await dChannel?.edit({ permissionOverwrites: item.Permissions }).catch(() => undefined);
+    });
+  }, Promise.resolve());
   
   const arrayMembers = updatedRoles.Members;
   const extraMembers = arrayMembers.length % Guards.length;
@@ -164,7 +170,7 @@ Guard.on("roleDelete", async (role) => {
     
     const guild = Guards[i].guilds.cache.get(Config.SERVER.GUILD_ID);
     await members.forEach(async (Id) => {
-      const member = await guild.members.cache.get(Id);
+      const [member] = await Promise.all([guild.members.cache.get(Id)]);
       await member?.roles.add(newRole.id).catch(() => undefined);
     });
   });
