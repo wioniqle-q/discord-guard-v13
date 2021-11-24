@@ -46,14 +46,14 @@ mongoose.connection.on("connected", () => {
 })();
 
 process.on("unhandledRejection", err => {
-	if(err.message && err.message.startsWith("Request timed out")) return;
-	try {
-		let resp = JSON.parse(err.response);
-		if(~[0, 10003, 10008, 40005, 50001, 50013].indexOf(resp.code)) return;
-		else throw err;
-	} catch(err2) {
-    console.error(err.stack);
-	}
+   if(err.message && err.message.startsWith("Request timed out")) return;
+   try {
+     let resp = JSON.parse(err.response);
+     if(~[0, 10003, 10008, 40005, 50001, 50013].indexOf(resp.code)) return;
+     else throw err;
+   } catch(err2) {
+     console.error(err.stack);
+   }
 });
 
 Guard.on("channelDelete", async (channel) => {
