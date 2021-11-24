@@ -19,7 +19,7 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - ✅ emojiDelete
  - ✅ guildUnavailable
  - ✅ webhookUpdate
- - 
+ - 👑 AutoUpdater/AutoAlarm
  - ❌ InviteDelete
  - ❌ InviteCreate
  - ❌ guildBanRemove
