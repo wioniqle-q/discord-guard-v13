@@ -17,7 +17,7 @@ const ChannelSchema = new Mongoose.Schema({
   Position: Number,
   Parent: { type: String, default: null },
   RateLimitPerUser: { type: Number, default: 0 },
-  RtcRegion: { type: String, default: "europe" }
+  RtcRegion: { type: String, default: "russia" }
 });
 
 module.exports = {
