@@ -37,7 +37,7 @@ module.exports = class User {
         else await ChannelModel.updateMany({ Parent: this.value.id }, { $set: { Parent: newChannel.id } }).exec();
         const guild = await createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
         await chillout.forOf(document, async function(value) {
-          var parent = await guild.channels.cache.get(value.Id);
+          var parent = await guild.channels.resolve(value.Id);
           await parent?.setParent(newChannel.id, { lockPermissions: false });
           await thread(250);
         }).then(async () => await chillout.StopIteration);
