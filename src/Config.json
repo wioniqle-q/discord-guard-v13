@@ -6,7 +6,8 @@
   "BOTS": {
     "TOKENS": [],
     "MAIN_TOKEN": "",
-    "STATE": ""
+    "STATE": "",
+    "AUTO_UPDATE": true
   },
   "SERVER": {
     "GUILD_ID": "",
