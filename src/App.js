@@ -10,6 +10,7 @@ let Danger = false;
 const Config = require("./Config");
 const { RoleModel, ChannelModel } = require("./Models");
 const { createIndex, safeMembers, thread, backupGuard } = require("./Splash");
+const { bootUpdate } = require("./Updater");
 const dangerPermissions = ["ADMINISTRATOR", "KICK_MEMBERS", "MANAGE_GUILD", "BAN_MEMBERS", "MANAGE_ROLES", "MANAGE_WEBHOOKS", "MANAGE_CHANNELS"];
 
 mongoose.connect(Config.DATABASE.URL.replace("<dbname>", Config.DATABASE.NAME), { autoIndex: false, connectTimeoutMS: 10000, family: 4, useUnifiedTopology: true, useNewUrlParser: true });
@@ -17,6 +18,10 @@ mongoose.connect(Config.DATABASE.URL.replace("<dbname>", Config.DATABASE.NAME), 
 mongoose.connection.on("connected", () => {
   console.log("Mongoose connected!");
 });
+
+(async () => {
+  await bootUpdate();
+})();
 
 for (const Token of Config.BOTS.TOKENS) {
   const Bot = new Client({ intents: [32767] });
