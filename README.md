@@ -33,6 +33,7 @@ Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işl
  - src/Splash.js
  - Added a some new stuff
  - Projeye otomatik güncelleme geldiğinde altyapınıza anında uyarı gelecek.
+ - Çok yakında otomatik güncelleme alan versiyonu gelecek!
  
 ## Düzeltilen buglar
  - Rol pozisyonu değiştirip sunucuya vurma bugu.
