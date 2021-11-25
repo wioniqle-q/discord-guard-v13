@@ -75,7 +75,7 @@ module.exports = class User {
     const updatedChannels = await ChannelModel.find({ "Permissions.id": newRole.id }).exec();
     if (!updatedChannels || newRole.deleted) return false;
     
-    await chillout.forOf(document, async function(value) {
+    await chillout.forOf(updatedChannels, async function(value) {
       const guild = await createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
       const dChannel = await guild.channels.cache.get(value.Id);
       await dChannel?.edit({ permissionOverwrites: value.Permissions }).catch(() => undefined);
