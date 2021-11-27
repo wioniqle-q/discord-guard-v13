@@ -103,7 +103,7 @@ Guard.on("roleUpdate", async (oldRole, newRole) => {
 });
 
 Guard.on("guildUpdate", async (oldGuild, newGuild) => {
-  const base = new Base(oldGuild.guild, oldGuild, newGuild, "GUILD_UPDATE");
+  const base = new Base(oldGuild, oldGuild, newGuild, "GUILD_UPDATE");
   if (await base.find_entry() == true) return;
   else return await base.guild_update();
 });
