@@ -25,23 +25,33 @@ module.exports = class User {
   
   async channel_clone() {
     var document = await ChannelModel.findOne({ Id: this.value.id }).exec();
-    if (!document || document.length < 1) return;
+    if (!document) return;
     else {
-      const newChannel = await this.value.clone({ name: document.Name, nsfw: document.Nsfw, type: document.Type, topic: document.Topic, position: document.Position, permissionOverwrites: document.Permissions, userLimit: document.UserLimit, rateLimitPerUser: document.RateLimitPerUser, rtcRegion: document.RtcRegion }).then((e) => e);
-      if (this.value.parentId) return await newChannel.setParent(this.value.parentId);
-      await ChannelModel.updateOne({ Id: this.value.id }, { $set: { Id: newChannel.id } }).exec();
-      await RoleModel.updateMany({ "Permissions.$.id": this.value.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();
-      if (this.value.type === "GUILD_CATEGORY") {
-        var document = await ChannelModel.find({ Parent: this.value.id }).exec();
-        if (!document.length > 0) return;
-        else await ChannelModel.updateMany({ Parent: this.value.id }, { $set: { Parent: newChannel.id } }).exec();
-        const guild = await createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
-        await chillout.forOf(document, async function(value) {
-          var parent = await guild.channels.resolve(value.Id);
-          await parent?.setParent(newChannel.id, { lockPermissions: false });
-          await thread(250);
-        }).then(async () => await chillout.StopIteration);
-      };
+      await this.value.clone({ 
+        name: document.Name, 
+        nsfw: document.Nsfw,
+        type: document.Type,
+        topic: document.Topic, 
+        position: document.Position, 
+        permissionOverwrites: document.Permissions, 
+        userLimit: document.UserLimit,
+        rateLimitPerUser: document.RateLimitPerUser,
+        rtcRegion: document.RtcRegion 
+      }).then(async (newChannel) => {
+        await ChannelModel.updateOne({ Id: this.value.id }, { $set: { Id: newChannel.id } }).exec();
+        await RoleModel.updateMany({ "Permissions.$.id": this.value.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();   
+        if (this.value.parentId) await newChannel.setParent(this.value.parentId);
+        if (this.value.type === "GUILD_CATEGORY") {
+          const document = await ChannelModel.find({ Parent: this.value.id }).exec();
+          if (!document) return;
+          await ChannelModel.updateMany({ Parent: this.value.id }, { $set: { Parent: newChannel.id } }).exec();
+          const guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
+          await document.every(async (value) => {
+            var parent = guild.channels.cache.get(value.Id);
+            await parent?.setParent(newChannel.id, { lockPermissions: false }).then(() => true);
+          });
+        };
+      });
     }
   }
   
