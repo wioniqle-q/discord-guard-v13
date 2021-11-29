@@ -27,16 +27,17 @@ module.exports = class User {
     var document = await ChannelModel.findOne({ Id: this.value.id }).exec();
     if (!document) return;
     else {
-      await this.value.clone({ 
-        name: document.Name, 
-        nsfw: document.Nsfw,
-        type: document.Type,
-        topic: document.Topic, 
-        position: document.Position, 
-        permissionOverwrites: document.Permissions, 
-        userLimit: document.UserLimit,
-        rateLimitPerUser: document.RateLimitPerUser,
-        rtcRegion: document.RtcRegion 
+      return await this.guild.channels.create(this.value.name.trim(), {
+        permissionOverwrites: this.value.permissionOverwrites.cache,
+        topic: this.value.topic,
+        type: [this.value.type],
+        nsfw: this.value.nsfw,
+        parent: this.value.parent,
+        bitrate: this.value.bitrate,
+        userLimit: this.value.userLimit,
+        rateLimitPerUser: this.value.rateLimitPerUser,
+        position: this.value.rawPosition,
+        reason: null
       }).then(async (newChannel) => {
         await ChannelModel.updateOne({ Id: this.value.id }, { $set: { Id: newChannel.id } }).exec();
         await RoleModel.updateMany({ "Permissions.$.id": this.value.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();   
@@ -47,8 +48,8 @@ module.exports = class User {
           await ChannelModel.updateMany({ Parent: this.value.id }, { $set: { Parent: newChannel.id } }).exec();
           const guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
           await document.every(async (value) => {
-            var parent = guild.channels.cache.get(value.Id);
-            await parent?.setParent(newChannel.id, { lockPermissions: false }).then(() => true);
+            var parent = await guild.channels.resolve(value.Id);
+            return parent?.edit({ parent: newChannel ?? null, lockPermissions: false }).then(() => true);
           });
         };
       });
