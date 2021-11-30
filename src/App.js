@@ -14,47 +14,51 @@ const { bootUpdate } = require("./Updater");
 const Base = require("./Base");
 const dangerPermissions = ["ADMINISTRATOR", "KICK_MEMBERS", "MANAGE_GUILD", "BAN_MEMBERS", "MANAGE_ROLES", "MANAGE_WEBHOOKS", "MANAGE_CHANNELS"];
 
-mongoose.connect(Config.DATABASE.URL.replace("<dbname>", Config.DATABASE.NAME), { autoIndex: false, connectTimeoutMS: 10000, family: 4, useUnifiedTopology: true, useNewUrlParser: true });
-
-mongoose.connection.on("connected", () => {
+mongoose.connect(Config.DATABASE.URL.replace("<dbname>", Config.DATABASE.NAME), { keepAlive: true, autoIndex: false, connectTimeoutMS: 10000, family: 4, useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connection.on('connected', function(){
   console.log("Mongoose connected!");
 });
 
-(async () => {
-  await bootUpdate();
-})();
+bootUpdate();
 
-(async () => {
-  for (const Token of Config.BOTS.TOKENS) {
-    const Bot = new Client({ intents: [32767] });
-    Bot.once("ready", () => {
-      Bot.Sleep = false;
-      Guards.push(Bot);
-    });  
-    await Bot.login(Token);
-  };
-  
-  Guard.once("ready", async () => {
-    console.log("Main bot ready!");
-    await backupGuard();
-    setInterval(async () => {
-      if(!Danger) await backupGuard();
-    }, 60 * 1000);
-  });
-  
-  await Guard.login(Config.BOTS.MAIN_TOKEN);
-})();
+for (const Token of Config.BOTS.TOKENS) {
+  const Bot = new Client({ intents: [32767] });
+  Bot.once("ready", () => {
+    Bot.Sleep = false;
+    Guards.push(Bot);
+    Guards.user.setPresence({ activities: [{ name: Config.BOTS.STATE }] });
+  });  
+  Bot.login(Token).then(() => true);
+};
+
+Guard.once("ready", async () => {
+  console.log("Main bot ready!");
+  Guard.user.setPresence({ activities: [{ name: Config.BOTS.STATE }] });
+  await backupGuard();
+  setInterval(async () => {
+    if(!Danger) await backupGuard();
+  }, 60 * 1000);
+});
+Guard.login(Config.BOTS.MAIN_TOKEN).then(() => true);
 
 process.on("unhandledRejection", err => {
-   if(err.message && err.message.startsWith("Request timed out")) return;
-   try {
-     let resp = JSON.parse(err.response);
-     if(~[0, 10003, 10008, 40005, 50001, 50013].indexOf(resp.code)) return;
-     else throw err;
-   } catch(err2) {
-     console.error(err.stack);
-   }
+	if(err.message && err.message.startsWith("Request timed out")) return;
+	try {
+		let resp = JSON.parse(err.response);
+		if(~[0, 10003, 10008, 40005, 50001, 50013].indexOf(resp.code)) return;
+		else throw err;
+	} catch(err2) {
+    console.error(err.stack);
+	}
 });
+
+process.on("SIGINT", function(){
+  mongoose.connection.close(function(){
+    process.exit(0);
+  });
+});
+
+process.on("uncaughtException", (error) => {});
 
 Guard.on("channelDelete", async (channel) => {
   const base = new Base(channel.guild, channel, "CHANNEL_DELETE");
