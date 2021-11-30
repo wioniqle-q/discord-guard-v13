@@ -43,7 +43,7 @@ module.exports = class User {
         await RoleModel.updateMany({ "Permissions.$.id": this.value.id }, { $set: { "Permissions.$.id": newChannel.id } }).exec();   
         if (this.value.parentId) await newChannel.setParent(this.value.parentId);
         if (this.value.type === "GUILD_CATEGORY") {
-          const document = await ChannelModel.find({ Parent: this.value.id }).exec();
+          const document = await ChannelModel.find({ Parent: this.value.id }).lean().exec();
           if (!document) return;
           await ChannelModel.updateMany({ Parent: this.value.id }, { $set: { Parent: newChannel.id } }).exec();
           const guild = createIndex(1)[0].guilds.cache.get(Config.SERVER.GUILD_ID); 
