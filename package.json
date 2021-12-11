@@ -1,6 +1,6 @@
 {
   "name": "discord-guard-v13-main",
-  "version": "10.2.8",
+  "version": "10.2.9",
   "description": "Sunucunuzu korumanız için birebir guard. Çoklu token sayesinde hızlıca işlemlerinizi halledebilirsiniz.",
   "main": "src/App.js",
   "scripts": {
