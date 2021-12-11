@@ -14,10 +14,14 @@ const { bootUpdate } = require("./Updater");
 const Base = require("./Base");
 const dangerPermissions = ["ADMINISTRATOR", "KICK_MEMBERS", "MANAGE_GUILD", "BAN_MEMBERS", "MANAGE_ROLES", "MANAGE_WEBHOOKS", "MANAGE_CHANNELS"];
 
-mongoose.connect(Config.DATABASE.URL.replace("<dbname>", Config.DATABASE.NAME), { keepAlive: true, autoIndex: false, connectTimeoutMS: 10000, family: 4, useUnifiedTopology: true, useNewUrlParser: true });
-mongoose.connection.on('connected', function(){
-  console.log("Mongoose connected!");
-});
+mongoose.connect(Config.DATABASE.URL.replace("myFirstDatabase", Config.DATABASE.NAME), {
+  "auth": {
+    "username": "",
+    "password": ""
+  },
+  "authSource": "admin",
+  keepAlive: true, autoIndex: false, connectTimeoutMS: 10000, family: 4, useUnifiedTopology: true, useNewUrlParser: true
+}).then(result => console.log("Mongoose connected!")).catch(err => console.log(err));
 
 bootUpdate();
 
