@@ -113,7 +113,7 @@ module.exports = class User {
   }
   
   async guild_update() {
-    if(this.value.vanityURLCode !== this.newC.vanityURLCode) await axios({ method: "patch", url: `https://discord.com/api/v6/guilds/${this.value.id}/vanity-url`, data: { code: Config.SERVER.VANITY_URL }, headers: { authorization: `Bot ${Config.BOTS.MAIN_TOKEN}` } });
+    if(this.value.vanityURLCode !== this.newC.vanityURLCode) await axios({ method: "patch", url: `https://discord.com/api/v9/guilds/${this.value.id}/vanity-url`, data: { code: Config.SERVER.VANITY_URL }, headers: { authorization: `Bot ${Config.BOTS.MAIN_TOKEN}` } });
     await this.newC.edit({ name: this.value.name, verificationLevel: this.value.verificationLevel, explicitContentFilter: this.value.explicitContentFilter, afkChannel: this.value.afkChannel, systemChannel: this.value.systemChannel, afkTimeout: this.value.afkTimeout, icon: this.value.icon, owner: this.value.owner, splash: this.value.splash, discoverySplash: this.value.discoverySplash, banner: this.value.banner, defaultMessageNotifications: this.value.defaultMessageNotifications, systemChannelFlags: this.value.systemChannelFlags, rulesChannel: this.value.rulesChannel, publicUpdatesChannel: this.value.publicUpdatesChannel, preferredLocale: this.value.preferredLocale, description: this.value.description, features: this.value.features });
   }
 }
