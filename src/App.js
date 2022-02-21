@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const chillout = require("chillout");
 
-const Guard = global.Guard = new Client({ intents: [32767] });
+const { GatewayIntentBits } = require('discord-api-types/v9');
+const Guard = global.Guard = new Client({ intents: Object.values(GatewayIntentBits).reduce((acc, p) => acc | p, 0) });
 const Guards = global.Guards = [];
 let Danger = false;
 
