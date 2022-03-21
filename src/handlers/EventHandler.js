@@ -68,6 +68,6 @@ module.exports = class EventHandler {
       } catch (e) {
         console.log("An error occurred when loading the events", { e });
       }
-    });
+    })();
   }
 };
