@@ -63,7 +63,7 @@ module.exports = class EventHandler {
             );
           }
 
-          _this.bot.on(event.name, event.exec.bind(null, _this.bot));
+          _this.bot.on(event.name, (...args) => event.exec(_this.bot, ...args));
         }
       } catch (e) {
         console.log("An error occurred when loading the events", { e });
