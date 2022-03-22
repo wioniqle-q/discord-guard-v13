@@ -8,6 +8,9 @@ module.exports = class ReadyEvent extends Event {
 
   async exec(bot = Bot) {
     bot.winston.info("Main bot is running");
-    if (bot.danger === false) await bot.util.getBackup();   
+    
+    setInterval(async () => {
+      if (bot.danger === false) await bot.util.getBackup();  
+    }, 1000 * 60); 
   }
 };
