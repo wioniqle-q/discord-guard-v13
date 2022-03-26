@@ -3,6 +3,7 @@ function _asyncToGenerator2(fn) { return function () { var gen = fn.apply(this, 
 function _asyncToGenerator3(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 function _asyncToGenerator4(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 function _asyncToGenerator5(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+function _asyncToGenerator6(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 
 const Bot = require("../structures/Bot");
 const Config = require("../../Config");
@@ -50,19 +51,18 @@ module.exports = class Util {
   }
 
   loginToSup() {
-    (async () => {
-      for await (var TOKEN of Config.TOKENS) {
+    var _this = this;
+
+    _asyncToGenerator6(function* () {
+      for (var TOKEN of Config.TOKENS) {
         var newSub = new Client({
-         intents: [
-           GatewayIntentBits.Guilds,
-           GatewayIntentBits.GuildMembers
-         ]
+          intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
         });
-        
-        newSub.on("ready", () => {
-          this.dist.push(newSub);
+
+        newSub.on("ready", function () {
+          _this.dist.push(newSub);
         });
-        
+
         newSub.login(TOKEN);
       }
     })();
