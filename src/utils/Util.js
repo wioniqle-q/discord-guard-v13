@@ -9,7 +9,7 @@ const Config = require("../../Config");
 const Winston = require("./Winston");
 const { RoleModel, ChannelModel } = require("../models/Model");
 const { setTimeout: sleep } = require('node:timers/promises');
-const { ChannelType } = require("discord-api-types/v9");
+const { ChannelType, GatewayIntentBits } = require('discord-api-types/v10');
 const { Client, Intents } = require('discord.js');
 
 module.exports = class Util {
@@ -50,17 +50,22 @@ module.exports = class Util {
   }
 
   loginToSup() {
-    for (const TOKEN of Config.TOKENS) {
-      const newSub = new Client({
-        intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES]
-      });
-
-      newSub.on("ready", () => {
-        this.dist.push(newSub);
-      });
-
-      newSub.login(TOKEN);
-    }
+    (async () => {
+      for await (var TOKEN of Config.TOKENS) {
+        var newSub = new Client({
+         intents: [
+           GatewayIntentBits.Guilds,
+           GatewayIntentBits.GuildMembers
+         ]
+        });
+        
+        newSub.on("ready", () => {
+          this.dist.push(newSub);
+        });
+        
+        newSub.login(TOKEN);
+      }
+    })();
   }
 
   getBackup() {
