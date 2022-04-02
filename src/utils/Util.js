@@ -4,6 +4,7 @@ function _asyncToGenerator3(fn) { return function () { var gen = fn.apply(this, 
 function _asyncToGenerator4(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 function _asyncToGenerator5(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 function _asyncToGenerator6(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
+function _asyncToGenerator7(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 
 const Bot = require("../structures/Bot");
 const Config = require("../../Config");
@@ -71,52 +72,45 @@ module.exports = class Util {
   getBackup() {
     var _this = this;
 
-    return _asyncToGenerator2(function* () {
-      const guild = _this.bot.guilds.cache.get(Config.GUILD_ID);
-      if (!guild || !guild.channels.cache.size) return false;
+    return _asyncToGenerator(function* () {
+      var guild = _this.bot.guilds.cache.get(Config.GUILD_ID);
+      if (!guild || guild.roles.cache.size == Number("") || guild.channels.cache.size == Number("")) return false;
 
-      yield RoleModel.deleteMany();
-      guild.roles.cache.sort((a, b) => a.id - b.id).filter(role => !role.managed && role.editable).forEach((() => {
-        var ref = _asyncToGenerator4(function* (role) {
-          yield new RoleModel({
-            id: role.id,
-            members: role.members.map(function (member) {
+      var roles = guild.roles.cache.sort(function (x, y) {
+        return x.id - y.id;
+      }).filter(function (role) {
+        return !role.managed && role.editable;
+      });
+      for (var role of [...roles.values()]) {
+        if (!role.members) break;
+        yield RoleModel.updateOne({ id: role.id }, { $set: { members: role.members.map(function (member) {
               return member.id;
-            })
-          }).save();
-        });
+        }) } }, { upsert: true }).exec();
+      }
 
-        return function (_x6) {
-          return ref.apply(this, arguments);
-        };
-      })());
-
-      yield ChannelModel.deleteMany();
-      guild.channels.cache.sort(function (a, b) {
-        return a.id - b.id;
+      var channels = guild.channels.cache.sort(function (x, y) {
+        return x.id - y.id;
       }).filter(function (channel) {
         return !channel.isThread();
-      }).forEach((() => {
-        var ref = _asyncToGenerator2(function* (channel) {
-          yield new ChannelModel({
-            id: channel.id,
-            type: channel.type,
-            parent: channel.parentId,
-            permissionOverwrites: channel.permissionOverwrites.cache.map((permission) => {
-              return {
-                id: permission.id,
-                type: permission.type,
-                allow: permission.allow.toArray(),
-                deny: permission.deny.toArray(),
-              };
-            }),
-          }).save();
-        });
+      });
+      for (var channel of [...channels.values()]) {
+        const findObject = yield ChannelModel.findOne({ id: channels.id }).exec();
+        if (findObject) break;
 
-        return function (_x2) {
-          return ref.apply(this, arguments);
-        };
-      })());
+        yield new ChannelModel({
+          id: channel.id,
+          type: channel.type,
+          parent: channel.parentId ? channel.parentId : "",
+          permissionOverwrites: channel.permissionOverwrites.cache.map(function (permission) {
+            return {
+              id: permission.id,
+              type: permission.type,
+              allow: permission.allow.toArray(),
+              deny: permission.deny.toArray()
+            };
+          })
+        }).save();
+      }
 
       new Winston().info("Backup retrieved again");
     })();
