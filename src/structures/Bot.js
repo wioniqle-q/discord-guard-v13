@@ -1,6 +1,6 @@
 const DJS = require("discord.js");
 const mongoose = require("mongoose");
-const { GatewayIntentBits } = require("discord-api-types/v9");
+const { GatewayIntentBits } = require("discord-api-types/v10");
 const EventHandler = require("../handlers/EventHandler");
 const Util = require("../utils/Util");
 const Resolvers = require("../utils/Resolvers");
