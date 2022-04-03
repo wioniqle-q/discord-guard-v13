@@ -70,47 +70,55 @@ module.exports = class Util {
   }
 
   getBackup() {
-    var _this = this;
+    var _this5 = this;
 
-    return _asyncToGenerator(function* () {
-      var guild = _this.bot.guilds.cache.get(Config.GUILD_ID);
-      if (!guild || guild.roles.cache.size == Number("") || guild.channels.cache.size == Number("")) return false;
+    return _asyncToGenerator7(function* () {
+      var guild = _this5.bot.guilds.cache.get(Config.GUILD_ID);
+      if (!guild || guild.roles.cache.size == 0 && guild.channels.cache.size == 0) return false;
 
-      var roles = guild.roles.cache.sort(function (x, y) {
+      guild.roles.cache.sort(function (x, y) {
         return x.id - y.id;
       }).filter(function (role) {
-        return !role.managed && role.editable;
-      });
-      for (var role of [...roles.values()]) {
-        if (!role.members) break;
-        yield RoleModel.updateOne({ id: role.id }, { $set: { members: role.members.map(function (member) {
-              return member.id;
-        }) } }, { upsert: true }).exec();
-      }
+        return !role.managed && role.editable && role.id != guild.id;
+      }).each((() => {
+        var ref = _asyncToGenerator7(function* (query) {
+          if (query.members.size <= 0) return;
 
-      var channels = guild.channels.cache.sort(function (x, y) {
+          yield RoleModel.updateOne({ id: query.id }, { $set: { members: query.members.map(function (member) {
+                return member.id;
+              }) } }, { upsert: true }).exec();
+        });
+
+        return function (_x2) {
+          return ref.apply(this, arguments);
+        };
+      })());
+
+      guild.channels.cache.sort(function (x, y) {
         return x.id - y.id;
       }).filter(function (channel) {
         return !channel.isThread();
-      });
-      for (var channel of [...channels.values()]) {
-        const findObject = yield ChannelModel.findOne({ id: channels.id }).exec();
-        if (findObject) break;
+      }).each((() => {
+        var ref = _asyncToGenerator7(function* (query) {
+          yield ChannelModel.updateOne({ id: query.id }, { $set: {
+              id: query.id,
+              type: query.type,
+              parent: query.parentId ? query.parentId : "",
+              permissionOverwrites: query.permissionOverwrites.cache.map(function (permission) {
+                return {
+                  id: permission.id,
+                  type: permission.type,
+                  allow: permission.allow.toArray(),
+                  deny: permission.deny.toArray()
+                };
+              })
+            } }, { upsert: true }).exec();
+        });
 
-        yield new ChannelModel({
-          id: channel.id,
-          type: channel.type,
-          parent: channel.parentId ? channel.parentId : "",
-          permissionOverwrites: channel.permissionOverwrites.cache.map(function (permission) {
-            return {
-              id: permission.id,
-              type: permission.type,
-              allow: permission.allow.toArray(),
-              deny: permission.deny.toArray()
-            };
-          })
-        }).save();
-      }
+        return function (_x6) {
+          return ref.apply(this, arguments);
+        };
+      })());
 
       new Winston().info("Backup retrieved again");
     })();

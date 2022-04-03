@@ -1,6 +1,6 @@
 {
   "name": "discord-guard",
-  "version": "0.0.1",
+  "version": "1.4.0",
   "description": "Wioniqle.q discord guard bot.",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "mongoose": "^6.2.8",
     "winston": "^3.6.0",
     "fast-glob": "^3.2.11",
-	  "discord-api-types": "^0.30.0"
+"discord-api-types": "^0.30.0"
   },
   "engines": {
     "node": "16.x"
