@@ -242,7 +242,7 @@ module.exports = class Util {
         
         ChannelModel.find({ parent: channel.id }, (() => {
           var ref = _asyncToGenerator(function* (error, document) {
-            ChannelModel.findOneAndUpdate({ parent: channel.id }, { $set: { parent: newChannel.id } }).exec((() => {
+            ChannelModel.updateMany({ parent: channel.id }, { $set: { parent: newChannel.id } }).exec((() => {
               var ref = _asyncToGenerator5(function* (e, deps) {
                 if (e) console.log(e);
               });
