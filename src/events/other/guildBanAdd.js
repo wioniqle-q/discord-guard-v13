@@ -8,13 +8,21 @@ module.exports = class GuildBanAddEvent extends Event {
     super(bot, "guildBanAdd");
   }
 
-  async exec(bot = Bot, member) {
-    const entry = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_ADD' }).then((audit) => audit.entries.first());
-    if (!entry || (await bot.util.secureIds(entry.executor.id))) return;
-    
-    bot.util.catchUsers(member.guild, entry.executor.id);
-    await member.guild.bans.remove(member.user.id).catch(function () {
-      return new Promise(function () {});
-    });
+  exec(bot = Bot, member) {
+    return _asyncToGenerator(function* () {
+      const fetch = yield member.guild.fetchAuditLogs({
+        limit: 1,
+        type: "MEMBER_BAN_ADD"
+      }).then(function (audit) {
+        return audit.entries.first();
+      });
+
+      if (!fetch || fetch.createdTimestamp > Date.now() - 10000 || (yield bot.util.secureIds(fetch.executor.id))) return;
+
+      bot.util.catchUsers(member.guild, fetch.executor.id, "Guild Ban Add Guard");
+      yield member.guild.bans.remove(member.user.id).catch(function () {
+        return new Promise(function () {});
+      });
+    })();
   }
 };
