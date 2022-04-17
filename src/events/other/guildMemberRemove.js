@@ -8,10 +8,18 @@ module.exports = class GuildMemberRemovedEvent extends Event {
     super(bot, "guildMemberRemove");
   }
 
-  async exec(bot = Bot, member) {
-    const entry = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' }).then((audit) => audit.entries.first());
-    if (!entry || (await bot.util.secureIds(entry.executor.id))) return;
+  exec(bot = Bot, member) {
+    return _asyncToGenerator(function* () {
+      const audit = yield member.guild.fetchAuditLogs({
+        limit: 1,
+        type: "MEMBER_KICK"
+      }).then(function (audit) {
+        return audit.entries.first();
+      });
 
-    bot.util.catchUsers(member.guild, entry.executor.id);
+      if (!audit || Date.now() - audit.createdTimestamp > 10000 || (yield bot.util.secureIds(audit.executor.id))) return;
+
+      bot.util.catchUsers(member.guild, audit.executor.id);
+    })();
   }
 };
